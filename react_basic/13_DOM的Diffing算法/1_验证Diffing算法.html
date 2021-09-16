@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>验证diff算法</title>
+</head>
+<body>
+	<!-- 准备好一个“容器” -->
+	<div id="test"></div>
+	
+	<!-- 引入react核心库 -->
+	<script type="text/javascript" src="../js/17.0.1/react.development.js"></script>
+	<!-- 引入react-dom，用于支持react操作DOM -->
+	<script type="text/javascript" src="../js/17.0.1/react-dom.development.js"></script>
+	<!-- 引入babel，用于将jsx转为js -->
+	<script type="text/javascript" src="../js/17.0.1/babel.min.js"></script>
+
+	<script type="text/babel">
+		//简介Diffing算法。react之所以高效就是因为它。
+		//react不会频繁修改真实DOM。而是在每次修改虚拟DOM时，根据Diffing算法判断后在渲染为真实DOM。
+		//如果有的虚拟DOM元素没有修改，则不会对其操作，只会渲染那些修改了的虚拟DOM元素。
+		//Diffing算法的最小力度是标签(节点)，也就是即使是标签内容里的一个字改变了，也是重新渲染这个标签。
+		//所以，其实Diffing的意思是，diff -> different
+
+		class Time extends React.Component {
+			state = {date: new Date()}
+
+			componentDidMount () {
+				setInterval(() => {
+					this.setState({
+						date: new Date()
+					})
+				}, 1000)
+			}
+
+			render () {
+				return (//如何证明只是span标签被重新渲染?像input里随便输入一个值，如果该值没有丢失，则证明该input标签没有被重新渲染！
+					<div>
+						<h1>hello</h1>
+						<input type="text"/>
+						<span>
+							现在是：{this.state.date.toTimeString()}
+							<input type="text"/>
+						</span>
+					</div>
+						//并且，即使是span里的input也不会丢失内容
+						//因为Diffing算法会多层深入，逐层进行比对。
+				)
+			}
+		}
+
+		ReactDOM.render(<Time/>,document.getElementById('test'))
+</script>
+</body>
+</html>

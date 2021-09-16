@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>1_非受控组件</title>
+</head>
+<body>
+	<!-- 准备好一个“容器” -->
+	<div id="test"></div>
+	
+	<!-- 引入react核心库 -->
+	<script type="text/javascript" src="../js/react.development.js"></script>
+	<!-- 引入react-dom，用于支持react操作DOM -->
+	<script type="text/javascript" src="../js/react-dom.development.js"></script>
+	<!-- 引入babel，用于将jsx转为js -->
+	<script type="text/javascript" src="../js/babel.min.js"></script>
+
+	<script type="text/babel">
+		// 需求: 定义一个包含表单的组件
+		// 输入用户名密码后, 点击登录提示输入信息
+
+		//非受控组件，现用现取
+		//表单内输入类DOM（包括输入框，单选按钮等）的值，是在点击按钮时，调用回调里的函数才提取出来。
+
+		//创建组件
+		class Login extends React.Component{
+			handleSubmit = (event)=>{
+				event.preventDefault() //阻止表单提交。之后依靠ajax交互，而不是表单。实现页面无刷新获取送数据（无刷新指的是网址不变，刷新按钮没转过，表单内容没变）
+				const {username,password} = this
+				alert(`你输入的用户名是：${username.value},你输入的密码是：${password.value}`)
+			}
+			render(){
+				return(//不指定请求方式，form表单默认是get请求，默认参数是query(就是?username=xxx&password=xxx这种格式的)
+						//原生里，表单有一个事件叫onsubmit。react里也有，只是s大写，onSubmit
+					<form onSubmit={this.handleSubmit}>
+						用户名：<input ref={c => this.username = c} type="text" name="username"/>
+						密码：<input ref={c => this.password = c} type="password" name="password"/>
+						<button>登录</button>
+					</form>
+						//button标签的默认type属性值为submit
+				)
+			}
+		}
+		//渲染组件
+		ReactDOM.render(<Login/>,document.getElementById('test'))
+	</script>
+</body>
+</html>

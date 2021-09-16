@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>高阶函数_函数柯里化</title>
+</head>
+<body>
+	<!-- 准备好一个“容器” -->
+	<div id="test"></div>
+	
+	<!-- 引入react核心库 -->
+	<script type="text/javascript" src="../js/react.development.js"></script>
+	<!-- 引入react-dom，用于支持react操作DOM -->
+	<script type="text/javascript" src="../js/react-dom.development.js"></script>
+	<!-- 引入babel，用于将jsx转为js -->
+	<script type="text/javascript" src="../js/babel.min.js"></script>
+
+	<script type="text/babel">
+		//#region
+				/*
+					ps：有时候写注释不能折叠，可以使用这种方式，在首尾加上#region和#endregion
+
+					高阶函数：如果一个函数符合下面2个规范中的任何一个，那该函数就是高阶函数。
+									1.若A函数，接收的参数是一个函数，那么A就可以称之为高阶函数。
+									2.若A函数，调用的返回值依然是一个函数，那么A就可以称之为高阶函数。
+									常见的高阶函数有：Promise、setTimeout、arr.map()等等
+
+					函数的柯里化：通过函数调用继续返回函数的方式，实现多次接收参数最后统一处理的函数编码形式。
+					见复习->6_演示函数的柯里化.html
+						function sum(a){
+							return(b)=>{
+								return (c)=>{
+									return a+b+c
+								}
+							}
+						}
+					*/
+		//#endregion
+		//创建组件
+		class Login extends React.Component{
+			//初始化状态
+			state = {
+				username:'', //用户名
+				password:'' //密码
+			}
+
+			//把之前的saveUsername和savePassword两个方法整合成一个。（不然如果还有地址，邮箱啥的还要写很多相同的方法。）
+			//保存表单数据到状态中
+			//错误的：这样写，下面的onChange={this.saveFormData('username')}和onChange={this.saveFormData('password')}使用了()，调用了saveFormData
+			//意思不是把saveFormDate这个函数交给onChange作为回调，而是是把saveFormDate的返回值交给了onChange作为回调
+			//而saveFormDate没设返回值，默认undefined
+			//所以效果是只会输出一次username和password，然后做任何操作都不会调用saveFormDate，因为是undefined
+			// saveFormData = (event) => {
+			// 	console.log(event);
+			// }
+
+			//正确的：解决方式就是让saveFormData的返回值是一个函数
+			//而此时，这个saveFormData就是一个高阶函数！！！且用到了函数的柯里化
+			saveFormData = (dataType)=>{//不想用柯里化想在这里也把event一起接收？这里不可能，因为event是react帮你生成的。谁都想这么写，但写不了。
+										//其他方式不用柯里化的演示，见2_不用函数柯里化的实现.html
+				console.log(dataType);
+				return (event)=>{//这个return的函数，才是react帮你调用的回调函数，因此有一个event参数
+					// console.log("@");//测试
+					console.log(dataType, event.target.value)
+					// this.setState({[dataType]:event.target.value})
+				}
+			}
+
+			//表单提交的回调
+			handleSubmit = (event)=>{
+				event.preventDefault() //阻止表单提交
+				const {username,password} = this.state
+				alert(`你输入的用户名是：${username},你输入的密码是：${password}`)
+			}
+			render(){
+				return(//this.saveFormData('username')的形式相当于自己调用了这个函数，但因为该函数会return一个函数，所以return的那个函数，才是真正的回调函数
+						//所以原则就是，你必须要把一个函数交给一个事件作为回调函数
+					<form onSubmit={this.handleSubmit}>
+						用户名：<input onChange={this.saveFormData('username')} type="text" name="username"/>
+						密码：<input onChange={this.saveFormData('password')} type="password" name="password"/>
+						<button>登录</button>
+					</form>
+				)
+			}
+		}
+		//渲染组件
+		ReactDOM.render(<Login/>,document.getElementById('test'))
+	</script>
+</body>
+</html>

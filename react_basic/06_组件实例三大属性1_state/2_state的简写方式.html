@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>state简写方式</title>
+</head>
+<body>
+	<!-- 准备好一个“容器” -->
+	<div id="test"></div>
+	
+	<!-- 引入react核心库 -->
+	<script type="text/javascript" src="../js/react.development.js"></script>
+	<!-- 引入react-dom，用于支持react操作DOM -->
+	<script type="text/javascript" src="../js/react-dom.development.js"></script>
+	<!-- 引入babel，用于将jsx转为js -->
+	<script type="text/javascript" src="../js/babel.min.js"></script>
+
+	<script type="text/babel">
+		//实际开发中写的都是简写
+
+		//1.创建组件
+		class Weather extends React.Component{
+			//初始化状态。和java一样。这样写可以不用写构造器。但如果在new的时候需要传入参数，则依然需要构造器。但明显state不用传参数
+			state = {isHot:false,wind:'微风'}
+
+			render(){
+				const {isHot,wind} = this.state
+				return <h1 onClick={this.changeWeather}>今天天气很{isHot ? '炎热' : '凉爽'}，{wind}</h1>
+			}
+
+			//自定义方法————要用赋值语句的形式+箭头函数。	不能写function(){}因为this是undefined!!
+			//这样写就不需要在构造器里绑定this了。相当于给实例对象添加一个changeWeather方法，而不是给原型添加。（因为赋值语句是给实例添加属性）
+			//且箭头函数没有自己的this。但如果在箭头函数里使用了this，不会报错，而是会找到它外层函数的this，作为自己的this来使用。
+			//简单说，changeWeather = ()=>{}和state = {}一样，都成为了Weather类的成员属性，通过组件的实例对象，即this来调用。
+			changeWeather = ()=>{
+				const isHot = this.state.isHot
+				this.setState({isHot:!isHot})//这里的this就是Weather组件的实例对象
+			}
+			//这样可以就可以避免在构造器里通过bind来绑定this了。避免如果有很多方法，需要bind好几次的情况。
+		}
+		//2.渲染组件到页面
+		ReactDOM.render(<Weather/>,document.getElementById('test'))
+				
+	</script>
+</body>
+</html>
